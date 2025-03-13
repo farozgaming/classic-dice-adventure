@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { InfoIcon, ArrowUp, ArrowDown, Star, Heart, Share, MonitorIcon, VolumeIcon, ZapIcon, LayoutGrid, RefreshCw, HelpCircle } from 'lucide-react';
@@ -11,6 +11,17 @@ const DiceGame = () => {
   const [sliderValue, setSliderValue] = useState(50);
   const [diceResult, setDiceResult] = useState<number | null>(null);
   const [isRolling, setIsRolling] = useState(false);
+  const sliderRef = useRef<HTMLInputElement>(null);
+  const sliderContainerRef = useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+
+  useEffect(() => {
+    // Calculate win amount whenever slider value changes
+    if (amount) {
+      const calculatedWin = parseFloat(amount) * (100 / sliderValue);
+      setWinAmount(calculatedWin.toFixed(4));
+    }
+  }, [sliderValue, amount]);
 
   const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSliderValue(Number(e.target.value));
@@ -173,9 +184,9 @@ const DiceGame = () => {
             )}
           </div>
           
-          {/* New Custom Slider */}
+          {/* New Custom Slider with the provided style */}
           <div className="mt-8">
-            <div className="px-4 py-4 bg-[#4A5354] rounded-full flex items-center relative mx-2 h-[58px]">
+            <div className="px-4 py-4 bg-[#4A5354] rounded-full flex items-center relative mx-2 h-[58px]" ref={sliderContainerRef}>
               <div className="px-2 bg-[#292D2E] rounded-full flex items-center flex-1 h-6 relative">
                 <div className="flex flex-col items-center user-select-none touch-none w-full relative">
                   <div className="bg-[#FF9820] rounded-full w-full relative flex-grow h-[10px]">
@@ -189,7 +200,7 @@ const DiceGame = () => {
                       aria-valuemin={1}
                       aria-valuemax={98}
                       aria-orientation="horizontal"
-                      className="absolute transition-colors w-8 h-9 cursor-pointer z-20"
+                      className="absolute w-8 h-9 cursor-pointer z-20"
                       style={{
                         backgroundImage: `url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABICAYAAABGOvOzAAAACXBIWXMAABYlAAAWJQFJUiTwAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAJJSURBVHgB7ZxBTsJQEIb/FkmADbhjReqKpXIC9QZ6E2+gN1BPoN5ATwCeQLwANmHDDhISQkLgOUNblFIKadDAm/mSH8jQt5if9x5tMvMcbIkxpkJvV6Rz0hnJI1WwHwxIPqlNapHeHMcZYBdQ4h7pgdQ3h8UTyUNWaHCFdG8On/u0PJ01yXv01kQwzW3AJ13SsvDjX7jxACXP69um5BmP1AxzW2JpBlj4y8fxEZsJCwNMsMt/wN7kI3xSI/qX+L0EbmF/8oyHINc58xkQTv0vyOKEl0I0A+4gjxt+ccK134c8eA844RlwBZnMb+3ZgAvI5ZwNOIVczngP4PW/L091/82ADTAQzBEyMplMEuP5fD513Gw2w3Q6XYnncjm4rvtnY9eR2YBOp5MYr9frqePG4zG63e5KvFgsolarpY4dDofo9Xor8XK5jGq1iixks80i1AAIRw2AcNQACEcNgHDUAAhHDYBw1AAIRw2AcNQACEcNgHDUAAhHDYBw1AAIRw2AcNQACEcNgHDUAAhHDYBwMtcJjkajxHipVEodx6VuXCkWh8vcCoVC6lguzUsqz+PSvE3leesQXyjJS2A3DYaHyYAN8CGXecfIJ+TSZgNakEsrapnhhimJJfPHbtg/9wJ5PHPu2jbHn8JW0kfI4TFqn9XW2SgaBi5h932Bj6B5enHzt/QwFE6La9hpgk+6jp8hoAcoJF0dXtiAHRsj59BISn4rTHCIyrM5LPjAFz74xduUn4MtMT/H6Fwg6Db1sJ/H6LyTXrc9RucbdFjonenZgYsAAAAASUVORK5CYII=')`,
                         backgroundSize: '100% 100%',
@@ -200,6 +211,7 @@ const DiceGame = () => {
                       tabIndex={0}
                     >
                       <input 
+                        ref={sliderRef}
                         type="range"
                         min={1}
                         max={98}
@@ -297,3 +309,4 @@ const DiceGame = () => {
 };
 
 export default DiceGame;
+

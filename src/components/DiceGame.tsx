@@ -173,35 +173,55 @@ const DiceGame = () => {
             )}
           </div>
           
-          <div className="relative mt-8">
-            <div className="h-2 bg-gradient-to-r from-green-500 via-yellow-500 to-red-500 rounded-full overflow-hidden"></div>
-            <input
-              type="range"
-              min="1"
-              max="98"
-              value={sliderValue}
-              onChange={handleSliderChange}
-              className="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer"
-            />
-            <div 
-              className="absolute top-0 h-2 bg-green-500 rounded-full" 
-              style={{ width: `${sliderValue}%` }}
-            ></div>
-            <div 
-              className="absolute top-0 w-4 h-4 bg-white rounded-full shadow-lg transform -translate-x-1/2 -translate-y-1/4 pointer-events-none" 
-              style={{ left: `${sliderValue}%` }}
-            ></div>
-            
-            <div className="flex justify-between mt-4 text-gray-400 text-sm">
-              <span>0</span>
-              <span>25</span>
-              <span>50</span>
-              <span>75</span>
-              <span>100</span>
+          {/* New Custom Slider */}
+          <div className="mt-8">
+            <div className="px-4 py-4 bg-[#4A5354] rounded-full flex items-center relative mx-2 h-[58px]">
+              <div className="px-2 bg-[#292D2E] rounded-full flex items-center flex-1 h-6 relative">
+                <div className="flex flex-col items-center user-select-none touch-none w-full relative">
+                  <div className="bg-[#FF9820] rounded-full w-full relative flex-grow h-[10px]">
+                    <div 
+                      className="absolute rounded-full h-[10px] bg-gradient-to-r from-[#31EE88] to-[#9FE871]"
+                      style={{ left: 0, right: `${100 - sliderValue}%` }}
+                    ></div>
+                    <span 
+                      role="slider"
+                      aria-valuetext={sliderValue.toString()}
+                      aria-valuemin={1}
+                      aria-valuemax={98}
+                      aria-orientation="horizontal"
+                      className="absolute transition-colors w-8 h-9 cursor-pointer z-20"
+                      style={{
+                        backgroundImage: `url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABICAYAAABGOvOzAAAACXBIWXMAABYlAAAWJQFJUiTwAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAJJSURBVHgB7ZxBTsJQEIb/FkmADbhjReqKpXIC9QZ6E2+gN1BPoN5ATwCeQLwANmHDDhISQkLgOUNblFIKadDAm/mSH8jQt5if9x5tMvMcbIkxpkJvV6Rz0hnJI1WwHwxIPqlNapHeHMcZYBdQ4h7pgdQ3h8UTyUNWaHCFdG8On/u0PJ01yXv01kQwzW3AJ13SsvDjX7jxACXP69um5BmP1AxzW2JpBlj4y8fxEZsJCwNMsMt/wN7kI3xSI/qX+L0EbmF/8oyHINc58xkQTv0vyOKEl0I0A+4gjxt+ccK134c8eA844RlwBZnMb+3ZgAvI5ZwNOIVczngP4PW/L091/82ADTAQzBEyMplMEuP5fD513Gw2w3Q6XYnncjm4rvtnY9eR2YBOp5MYr9frqePG4zG63e5KvFgsolarpY4dDofo9Xor8XK5jGq1iixks80i1AAIRw2AcNQACEcNgHDUAAhHDYBw1AAIRw2AcNQACEcNgHDUAAhHDYBw1AAIRw2AcNQACEcNgHDUAAhHDYBwMtcJjkajxHipVEodx6VuXCkWh8vcCoVC6lguzUsqz+PSvE3leesQXyjJS2A3DYaHyYAN8CGXecfIJ+TSZgNakEsrapnhhimJJfPHbtg/9wJ5PHPu2jbHn8JW0kfI4TFqn9XW2SgaBi5h932Bj6B5enHzt/QwFE6La9hpgk+6jp8hoAcoJF0dXtiAHRsj59BISn4rTHCIyrM5LPjAFz74xduUn4MtMT/H6Fwg6Db1sJ/H6LyTXrc9RucbdFjonenZgYsAAAAASUVORK5CYII=')`,
+                        backgroundSize: '100% 100%',
+                        top: '-14px',
+                        left: `calc(${sliderValue}%)`,
+                        transform: 'translateX(-50%)'
+                      }}
+                      tabIndex={0}
+                    >
+                      <input 
+                        type="range"
+                        min={1}
+                        max={98}
+                        value={sliderValue}
+                        onChange={handleSliderChange}
+                        className="opacity-0 w-full h-full cursor-pointer absolute"
+                      />
+                    </span>
+                  </div>
+                  <div className="text-[#B3BEC1] text-sm w-full relative mt-10">
+                    <span className="absolute left-0 transform -translate-x-1">0</span>
+                    <span className="absolute left-1/4 transform -translate-x-2">25</span>
+                    <span className="absolute left-1/2 transform -translate-x-2">50</span>
+                    <span className="absolute left-3/4 transform -translate-x-2">75</span>
+                    <span className="absolute left-full transform -translate-x-3">100</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
           
-          <div className="grid grid-cols-3 gap-4 mt-8 bg-dark-200 rounded-lg p-4">
+          <div className="grid grid-cols-3 gap-4 mt-12 bg-dark-200 rounded-lg p-4">
             <div>
               <div className="text-gray-400 text-sm mb-1">Payout</div>
               <div className="flex items-center">

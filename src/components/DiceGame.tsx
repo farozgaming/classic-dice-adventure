@@ -13,6 +13,7 @@ const DiceGame = () => {
   const [isRolling, setIsRolling] = useState(false);
   const sliderRef = useRef<HTMLInputElement>(null);
   const sliderContainerRef = useRef<HTMLDivElement>(null);
+  const sliderTrackRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
 
   useEffect(() => {
@@ -23,8 +24,93 @@ const DiceGame = () => {
     }
   }, [sliderValue, amount]);
 
+  // Improved slider change handler with smoother step
   const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSliderValue(Number(e.target.value));
+    const newValue = Number(e.target.value);
+    if (newValue >= 1 && newValue <= 98) {
+      setSliderValue(newValue);
+    }
+  };
+
+  // Handle mouse/touch events for more precise control
+  const handleSliderMouseDown = (e: React.MouseEvent) => {
+    if (!sliderTrackRef.current) return;
+    
+    const updateSliderFromMousePosition = (clientX: number) => {
+      if (!sliderTrackRef.current) return;
+      
+      const rect = sliderTrackRef.current.getBoundingClientRect();
+      const trackWidth = rect.width;
+      const offset = clientX - rect.left;
+      
+      // Calculate percentage with constraints
+      let percentage = Math.min(Math.max((offset / trackWidth) * 100, 1), 98);
+      
+      // Round to nearest integer for better user experience
+      percentage = Math.round(percentage);
+      
+      setSliderValue(percentage);
+    };
+    
+    // Initial position update
+    updateSliderFromMousePosition(e.clientX);
+    
+    // Set up mousemove and mouseup handlers
+    const handleMouseMove = (e: MouseEvent) => {
+      updateSliderFromMousePosition(e.clientX);
+    };
+    
+    const handleMouseUp = () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+      setIsDragging(false);
+    };
+    
+    // Add event listeners
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+    setIsDragging(true);
+  };
+
+  // Touch event handlers for mobile
+  const handleSliderTouchStart = (e: React.TouchEvent) => {
+    if (!sliderTrackRef.current) return;
+    
+    const updateSliderFromTouchPosition = (clientX: number) => {
+      if (!sliderTrackRef.current) return;
+      
+      const rect = sliderTrackRef.current.getBoundingClientRect();
+      const trackWidth = rect.width;
+      const offset = clientX - rect.left;
+      
+      // Calculate percentage with constraints
+      let percentage = Math.min(Math.max((offset / trackWidth) * 100, 1), 98);
+      
+      // Round to nearest integer for better user experience
+      percentage = Math.round(percentage);
+      
+      setSliderValue(percentage);
+    };
+    
+    // Initial position update
+    updateSliderFromTouchPosition(e.touches[0].clientX);
+    
+    // Set up touch handlers
+    const handleTouchMove = (e: TouchEvent) => {
+      e.preventDefault(); // Prevent scrolling while dragging
+      updateSliderFromTouchPosition(e.touches[0].clientX);
+    };
+    
+    const handleTouchEnd = () => {
+      document.removeEventListener('touchmove', handleTouchMove);
+      document.removeEventListener('touchend', handleTouchEnd);
+      setIsDragging(false);
+    };
+    
+    // Add event listeners
+    document.addEventListener('touchmove', handleTouchMove, { passive: false });
+    document.addEventListener('touchend', handleTouchEnd);
+    setIsDragging(true);
   };
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -184,12 +270,17 @@ const DiceGame = () => {
             )}
           </div>
           
-          {/* New Custom Slider with the provided style */}
+          {/* Custom Slider - Fixed version */}
           <div className="mt-8">
             <div className="px-4 py-4 bg-[#4A5354] rounded-full flex items-center relative mx-2 h-[58px]" ref={sliderContainerRef}>
               <div className="px-2 bg-[#292D2E] rounded-full flex items-center flex-1 h-6 relative">
                 <div className="flex flex-col items-center user-select-none touch-none w-full relative">
-                  <div className="bg-[#FF9820] rounded-full w-full relative flex-grow h-[10px]">
+                  <div 
+                    ref={sliderTrackRef}
+                    className="bg-[#FF9820] rounded-full w-full relative flex-grow h-[10px]"
+                    onMouseDown={handleSliderMouseDown}
+                    onTouchStart={handleSliderTouchStart}
+                  >
                     <div 
                       className="absolute rounded-full h-[10px] bg-gradient-to-r from-[#31EE88] to-[#9FE871]"
                       style={{ left: 0, right: `${100 - sliderValue}%` }}
@@ -205,7 +296,7 @@ const DiceGame = () => {
                         backgroundImage: `url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABICAYAAABGOvOzAAAACXBIWXMAABYlAAAWJQFJUiTwAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAJJSURBVHgB7ZxBTsJQEIb/FkmADbhjReqKpXIC9QZ6E2+gN1BPoN5ATwCeQLwANmHDDhISQkLgOUNblFIKadDAm/mSH8jQt5if9x5tMvMcbIkxpkJvV6Rz0hnJI1WwHwxIPqlNapHeHMcZYBdQ4h7pgdQ3h8UTyUNWaHCFdG8On/u0PJ01yXv01kQwzW3AJ13SsvDjX7jxACXP69um5BmP1AxzW2JpBlj4y8fxEZsJCwNMsMt/wN7kI3xSI/qX+L0EbmF/8oyHINc58xkQTv0vyOKEl0I0A+4gjxt+ccK134c8eA844RlwBZnMb+3ZgAvI5ZwNOIVczngP4PW/L091/82ADTAQzBEyMplMEuP5fD513Gw2w3Q6XYnncjm4rvtnY9eR2YBOp5MYr9frqePG4zG63e5KvFgsolarpY4dDofo9Xor8XK5jGq1iixks80i1AAIRw2AcNQACEcNgHDUAAhHDYBw1AAIRw2AcNQACEcNgHDUAAhHDYBw1AAIRw2AcNQACEcNgHDUAAhHDYBwMtcJjkajxHipVEodx6VuXCkWh8vcCoVC6lguzUsqz+PSvE3leesQXyjJS2A3DYaHyYAN8CGXecfIJ+TSZgNakEsrapnhhimJJfPHbtg/9wJ5PHPu2jbHn8JW0kfI4TFqn9XW2SgaBi5h932Bj6B5enHzt/QwFE6La9hpgk+6jp8hoAcoJF0dXtiAHRsj59BISn4rTHCIyrM5LPjAFz74xduUn4MtMT/H6Fwg6Db1sJ/H6LyTXrc9RucbdFjonenZgYsAAAAASUVORK5CYII=')`,
                         backgroundSize: '100% 100%',
                         top: '-14px',
-                        left: `calc(${sliderValue}%)`,
+                        left: `${sliderValue}%`,
                         transform: 'translateX(-50%)'
                       }}
                       tabIndex={0}
@@ -215,6 +306,7 @@ const DiceGame = () => {
                         type="range"
                         min={1}
                         max={98}
+                        step={1}
                         value={sliderValue}
                         onChange={handleSliderChange}
                         className="opacity-0 w-full h-full cursor-pointer absolute"
@@ -309,4 +401,3 @@ const DiceGame = () => {
 };
 
 export default DiceGame;
-
